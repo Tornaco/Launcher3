@@ -250,13 +250,9 @@ public class PopupDataProvider implements NotificationListener.NotificationsChan
         if (shortcutId == null) {
             return notifications;
         }
-        String[] personKeys = ShortcutUtil.getPersonKeysIfPinnedShortcut(info);
         return notifications.stream().filter((NotificationKeyData notification) -> {
                     if (notification.shortcutId != null) {
                         return notification.shortcutId.equals(shortcutId);
-                    }
-                    if (notification.personKeysFromNotification.length != 0) {
-                        return Arrays.equals(notification.personKeysFromNotification, personKeys);
                     }
                     return false;
                 }).collect(Collectors.toList());

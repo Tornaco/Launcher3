@@ -46,14 +46,6 @@ public class ShortcutUtil {
     }
 
     /**
-     * Returns the person keys associated with the item. (Has no function right now.)
-     */
-    public static String[] getPersonKeysIfPinnedShortcut(ItemInfo info) {
-        return isActive(info) && isPinnedShortcut(info)
-                ? ((WorkspaceItemInfo) info).getPersonKeys() : Utilities.EMPTY_STRING_ARRAY;
-    }
-
-    /**
      * Returns true if the item is a deep shortcut.
      */
     public static boolean isDeepShortcut(ItemInfo info) {

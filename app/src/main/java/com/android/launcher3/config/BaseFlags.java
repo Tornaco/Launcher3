@@ -52,7 +52,7 @@ public abstract class BaseFlags {
     }
 
     public static boolean showFlagTogglerUi(Context context) {
-        return Utilities.IS_DEBUG_DEVICE && Utilities.isDevelopersOptionsEnabled(context);
+        return Utilities.IS_DEBUG_DEVICE;
     }
 
     public static final boolean IS_DOGFOOD_BUILD = false;
