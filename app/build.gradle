@@ -1,0 +1,103 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.protobuf'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion '29.0.3'
+
+    defaultConfig {
+        applicationId "com.android.launcher3.port"
+
+        minSdkVersion 25
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            proto {
+                srcDir 'protos/'
+                srcDir 'proto_overrides/'
+            }
+        }
+
+        debug {
+            manifest.srcFile "AndroidManifest.xml"
+        }
+
+        androidTest {
+            res.srcDirs = ['tests/res']
+            java.srcDirs = ['tests/src', 'tests/tapl']
+            manifest.srcFile "tests/AndroidManifest.xml"
+        }
+
+        androidTestDebug {
+            manifest.srcFile "tests/AndroidManifest.xml"
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation project(':IconLoader')
+    implementation project(':systemui')
+
+    implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation "androidx.preference:preference:1.1.1"
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation "org.mockito:mockito-core:1.9.5"
+    androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
+    androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.0'
+    androidTestImplementation 'com.android.support.test:rules:1.0.0'
+    androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+    androidTestImplementation "androidx.annotation:annotation:1.1.0"
+}
+
+protobuf {
+    // Configure the protoc executable
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.0.0-alpha-3'
+
+        generateProtoTasks {
+            all().each { task ->
+                task.builtins {
+                    remove java
+                    javanano {
+                        option "java_package=launcher_log_extension.proto|com.android.launcher3.userevent.nano"
+                        option "java_package=launcher_log.proto|com.android.launcher3.userevent.nano"
+                        option "java_package=launcher_dump.proto|com.android.launcher3.model.nano"
+                        option "enum_style=java"
+                    }
+                }
+            }
+        }
+    }
+}
