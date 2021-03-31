@@ -16,10 +16,6 @@
 
 package com.android.launcher3.dragndrop;
 
-import static com.android.launcher3.logging.LoggerUtils.newCommandAction;
-import static com.android.launcher3.logging.LoggerUtils.newContainerTarget;
-import static com.android.launcher3.logging.LoggerUtils.newItemTarget;
-import static com.android.launcher3.logging.LoggerUtils.newLauncherEvent;
 import static com.android.launcher3.util.Executors.MODEL_EXECUTOR;
 
 import android.annotation.TargetApi;
@@ -52,8 +48,6 @@ import com.android.launcher3.R;
 import com.android.launcher3.compat.AppWidgetManagerCompat;
 import com.android.launcher3.compat.LauncherAppsCompatVO;
 import com.android.launcher3.model.WidgetItem;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
 import com.android.launcher3.util.InstantAppResolver;
 import com.android.launcher3.views.BaseDragLayer;
 import com.android.launcher3.widget.PendingAddShortcutInfo;
@@ -120,12 +114,6 @@ public class AddItemActivity extends BaseActivity implements OnLongClickListener
 
         mWidgetCell.setOnTouchListener(this);
         mWidgetCell.setOnLongClickListener(this);
-
-        // savedInstanceState is null when the activity is created the first time (i.e., avoids
-        // duplicate logging during rotation)
-        if (savedInstanceState == null) {
-            logCommand(Action.Command.ENTRY);
-        }
     }
 
     @Override
@@ -241,7 +229,6 @@ public class AddItemActivity extends BaseActivity implements OnLongClickListener
      * Called when the cancel button is clicked.
      */
     public void onCancelClick(View v) {
-        logCommand(Action.Command.CANCEL);
         finish();
     }
 
@@ -251,7 +238,6 @@ public class AddItemActivity extends BaseActivity implements OnLongClickListener
     public void onPlaceAutomaticallyClick(View v) {
         if (mRequest.getRequestType() == PinItemRequest.REQUEST_TYPE_SHORTCUT) {
             InstallShortcutReceiver.queueShortcut(mRequest.getShortcutInfo(), this);
-            logCommand(Action.Command.CONFIRM);
             mRequest.accept();
             finish();
             return;
@@ -274,13 +260,11 @@ public class AddItemActivity extends BaseActivity implements OnLongClickListener
         InstallShortcutReceiver.queueWidget(mRequest.getAppWidgetProviderInfo(this), widgetId, this);
         mWidgetOptions.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
         mRequest.accept(mWidgetOptions);
-        logCommand(Action.Command.CONFIRM);
         finish();
     }
 
     @Override
     public void onBackPressed() {
-        logCommand(Action.Command.BACK);
         super.onBackPressed();
     }
 
@@ -318,12 +302,5 @@ public class AddItemActivity extends BaseActivity implements OnLongClickListener
     @Override
     public BaseDragLayer getDragLayer() {
         throw new UnsupportedOperationException();
-    }
-
-    private void logCommand(int command) {
-        getUserEventDispatcher().dispatchUserEvent(newLauncherEvent(
-                newCommandAction(command),
-                newItemTarget(mWidgetCell.getWidgetView(), mInstantAppResolver),
-                newContainerTarget(ContainerType.PINITEM)), null);
     }
 }

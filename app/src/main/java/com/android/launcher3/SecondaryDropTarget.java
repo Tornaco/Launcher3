@@ -30,10 +30,6 @@ import android.widget.Toast;
 import com.android.launcher3.Launcher.OnResumeCallback;
 import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.dragndrop.DragOptions;
-import com.android.launcher3.logging.FileLog;
-import com.android.launcher3.logging.LoggerUtils;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.util.Themes;
 
 import java.net.URISyntaxException;
@@ -95,14 +91,6 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
     @Override
     public int getAccessibilityAction() {
         return mCurrentAccessibilityAction;
-    }
-
-    @Override
-    public Target getDropTargetForLogging() {
-        Target t = LoggerUtils.newTarget(Target.Type.CONTROL);
-        t.controlType = mCurrentAccessibilityAction == UNINSTALL ? ControlType.UNINSTALL_TARGET
-                : ControlType.SETTINGS_BUTTON;
-        return t;
     }
 
     @Override
@@ -242,7 +230,6 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
                     .setData(Uri.fromParts("package", cn.getPackageName(), cn.getClassName()))
                     .putExtra(Intent.EXTRA_USER, info.user);
             mLauncher.startActivity(i);
-            FileLog.d(TAG, "start uninstall activity " + cn.getPackageName());
             return cn;
         } catch (URISyntaxException e) {
             Log.e(TAG, "Failed to parse intent to start uninstall activity for item=" + info);
@@ -276,12 +263,6 @@ public class SecondaryDropTarget extends ButtonDropTarget implements OnAlarmList
         public void onDropCompleted(View target, DragObject d,
                 boolean success) {
             mDragObject = d;
-        }
-
-        @Override
-        public void fillInLogContainerData(View v, ItemInfo info, Target target,
-                Target targetParent) {
-            mOriginal.fillInLogContainerData(v, info, target, targetParent);
         }
 
         @Override

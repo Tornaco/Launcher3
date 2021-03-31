@@ -59,7 +59,6 @@ import com.android.launcher3.AutoInstallsLayout.LayoutParserCallback;
 import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.config.FeatureFlags;
-import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.model.DbDowngradeHelper;
 import com.android.launcher3.provider.LauncherDbUtils;
 import com.android.launcher3.provider.LauncherDbUtils.SQLiteTransaction;
@@ -834,7 +833,6 @@ public class LauncherProvider extends ContentProvider {
             for (int widgetId : allWidgets) {
                 if (!validWidgets.contains(widgetId)) {
                     try {
-                        FileLog.d(TAG, "Deleting invalid widget " + widgetId);
                         host.deleteAppWidgetId(widgetId);
                     } catch (RuntimeException e) {
                         // Ignore

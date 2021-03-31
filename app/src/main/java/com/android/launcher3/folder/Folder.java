@@ -72,13 +72,7 @@ import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragController.DragListener;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
-import com.android.launcher3.logging.LoggerUtils;
 import com.android.launcher3.pageindicators.PageIndicatorDots;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action.Direction;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action.Touch;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ItemType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.util.Thunk;
 import com.android.launcher3.views.ClipPathView;
 import com.android.launcher3.widget.PendingAddShortcutInfo;
@@ -561,12 +555,6 @@ public class Folder extends AbstractFloatingView implements ClipPathView, DragSo
             public void onAnimationEnd(Animator animation) {
                 mState = STATE_OPEN;
                 announceAccessibilityChanges();
-
-                mLauncher.getUserEventDispatcher().logActionOnItem(
-                        Touch.TAP,
-                        Direction.NONE,
-                        ItemType.FOLDER_ICON, mInfo.cellX, mInfo.cellY);
-
                 mContent.setFocusOnFirstChild();
             }
         });
@@ -757,8 +745,7 @@ public class Folder extends AbstractFloatingView implements ClipPathView, DragSo
             mPrevTargetRank = mTargetRank;
 
             if (d.stateAnnouncer != null) {
-                d.stateAnnouncer.announce(getContext().getString(R.string.move_to_position,
-                        mTargetRank + 1));
+                d.stateAnnouncer.announce(getContext().getString(R.string.move_to_position, mTargetRank + 1));
             }
         }
 
@@ -1352,14 +1339,6 @@ public class Folder extends AbstractFloatingView implements ClipPathView, DragSo
         outRect.right += mScrollAreaOffset;
     }
 
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
-        target.gridX = info.cellX;
-        target.gridY = info.cellY;
-        target.pageIndex = mContent.getCurrentPage();
-        targetParent.containerType = ContainerType.FOLDER;
-    }
-
     private class OnScrollHintListener implements OnAlarmListener {
 
         private final DragObject mDragObject;
@@ -1448,17 +1427,6 @@ public class Folder extends AbstractFloatingView implements ClipPathView, DragSo
     }
 
     @Override
-    public void logActionCommand(int command) {
-        mLauncher.getUserEventDispatcher().logActionCommand(
-                command, getFolderIcon(), getLogContainerType());
-    }
-
-    @Override
-    public int getLogContainerType() {
-        return ContainerType.FOLDER;
-    }
-
-    @Override
     public boolean onBackPressed() {
         if (isEditingName()) {
             mFolderName.dispatchBackKey();
@@ -1486,8 +1454,6 @@ public class Folder extends AbstractFloatingView implements ClipPathView, DragSo
                         return true;
                     }
                 } else {
-                    mLauncher.getUserEventDispatcher().logActionTapOutside(
-                            LoggerUtils.newContainerTarget(ContainerType.FOLDER));
                     close(true);
                     return true;
                 }

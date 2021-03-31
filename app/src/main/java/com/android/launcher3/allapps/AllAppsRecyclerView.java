@@ -35,10 +35,6 @@ import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.R;
 import com.android.launcher3.allapps.AllAppsGridAdapter.AppsGridLayoutManager;
-import com.android.launcher3.compat.AccessibilityManagerCompat;
-import com.android.launcher3.logging.StatsLogUtils.LogContainerProvider;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.views.RecyclerViewFastScroller;
 
 import java.util.List;
@@ -46,7 +42,7 @@ import java.util.List;
 /**
  * A RecyclerView with custom fast scroll support for the all apps view.
  */
-public class AllAppsRecyclerView extends BaseRecyclerView implements LogContainerProvider {
+public class AllAppsRecyclerView extends BaseRecyclerView {
 
     private AlphabeticalAppsList mApps;
     private AllAppsFastScrollHelper mFastScrollHelper;
@@ -143,15 +139,6 @@ public class AllAppsRecyclerView extends BaseRecyclerView implements LogContaine
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         updateEmptySearchBackgroundBounds();
         updatePoolSize();
-    }
-
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
-        if (mApps.hasFilter()) {
-            targetParent.containerType = ContainerType.SEARCHRESULT;
-        } else {
-            targetParent.containerType = ContainerType.ALLAPPS;
-        }
     }
 
     public void onSearchResultsChanged() {

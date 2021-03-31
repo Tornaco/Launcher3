@@ -33,7 +33,6 @@ import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherAppWidgetProviderInfo;
 import com.android.launcher3.PendingAddItemInfo;
 import com.android.launcher3.uioverrides.UiFactory;
-import com.android.launcher3.userevent.nano.LauncherLogProto;
 import com.android.launcher3.widget.PendingAddShortcutInfo;
 import com.android.launcher3.widget.PendingAddWidgetInfo;
 import com.android.launcher3.widget.PendingItemDragHelper;
@@ -101,12 +100,6 @@ public class PinItemDragListener extends BaseItemDragListener {
             dragHelper.setPreview(getPreview(mRequest));
         }
         return dragHelper;
-    }
-
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, LauncherLogProto.Target target,
-            LauncherLogProto.Target targetParent) {
-        targetParent.containerType = LauncherLogProto.ContainerType.PINITEM;
     }
 
     @Override

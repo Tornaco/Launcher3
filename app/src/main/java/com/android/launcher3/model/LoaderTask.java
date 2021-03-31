@@ -65,7 +65,6 @@ import com.android.launcher3.icons.IconCache;
 import com.android.launcher3.icons.LauncherActivityCachingLogic;
 import com.android.launcher3.icons.LauncherIcons;
 import com.android.launcher3.icons.cache.IconCacheUpdateHandler;
-import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.provider.ImportDataTask;
 import com.android.launcher3.qsb.QsbContainerView;
 import com.android.launcher3.shortcuts.DeepShortcutManager;
@@ -452,8 +451,6 @@ public class LoaderTask implements Runnable {
                                 if (c.restoreFlag != 0) {
                                     // Package is not yet available but might be
                                     // installed later.
-                                    FileLog.d(TAG, "package not yet restored: " + targetPkg);
-
                                     tempPackageKey.update(targetPkg, c.user);
                                     if (c.hasRestoreFlag(WorkspaceItemInfo.FLAG_RESTORE_STARTED)) {
                                         // Restore has started once.

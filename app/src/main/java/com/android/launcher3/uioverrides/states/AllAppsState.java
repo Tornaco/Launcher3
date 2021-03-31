@@ -23,7 +23,6 @@ import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.R;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
 
 /**
  * Definition for AllApps state
@@ -42,7 +41,7 @@ public class AllAppsState extends LauncherState {
     };
 
     public AllAppsState(int id) {
-        super(id, ContainerType.ALLAPPS, ALL_APPS_TRANSITION_MS, STATE_FLAGS);
+        super(id, ALL_APPS_TRANSITION_MS, STATE_FLAGS);
     }
 
     @Override

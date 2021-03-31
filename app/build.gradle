@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.protobuf'
 
 android {
     compileSdkVersion 30
@@ -16,6 +15,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -31,13 +31,6 @@ android {
     }
 
     sourceSets {
-        main {
-            proto {
-                srcDir 'protos/'
-                srcDir 'proto_overrides/'
-            }
-        }
-
         androidTest {
             res.srcDirs = ['tests/res']
             java.srcDirs = ['tests/src', 'tests/tapl']
@@ -78,25 +71,4 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.0'
     androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     androidTestImplementation "androidx.annotation:annotation:1.1.0"
-}
-
-protobuf {
-    // Configure the protoc executable
-    protoc {
-        artifact = 'com.google.protobuf:protoc:3.0.0-alpha-3'
-
-        generateProtoTasks {
-            all().each { task ->
-                task.builtins {
-                    remove java
-                    javanano {
-                        option "java_package=launcher_log_extension.proto|com.android.launcher3.userevent.nano"
-                        option "java_package=launcher_log.proto|com.android.launcher3.userevent.nano"
-                        option "java_package=launcher_dump.proto|com.android.launcher3.model.nano"
-                        option "enum_style=java"
-                    }
-                }
-            }
-        }
-    }
 }

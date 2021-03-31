@@ -24,6 +24,7 @@ import android.animation.AnimatorSet;
 import android.animation.FloatArrayEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -46,13 +47,13 @@ import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.dragndrop.DragView;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.util.Thunk;
 
 /**
  * Implements a DropTarget.
  */
+@SuppressLint("AppCompatCustomView")
 public abstract class ButtonDropTarget extends TextView
         implements DropTarget, DragController.DragListener, OnClickListener {
 
@@ -394,6 +395,4 @@ public abstract class ButtonDropTarget extends TextView
                 TextUtils.TruncateAt.END);
         return !mText.equals(displayedText);
     }
-
-    public abstract Target getDropTargetForLogging();
 }

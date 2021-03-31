@@ -28,8 +28,6 @@ import static com.android.launcher3.LauncherState.NORMAL;
 import static com.android.launcher3.LauncherState.OVERVIEW;
 import static com.android.launcher3.LauncherState.OVERVIEW_PEEK;
 import static com.android.launcher3.dragndrop.DragLayer.ALPHA_INDEX_LAUNCHER_LOAD;
-import static com.android.launcher3.logging.LoggerUtils.newContainerTarget;
-import static com.android.launcher3.logging.LoggerUtils.newTarget;
 import static com.android.launcher3.states.RotationHelper.REQUEST_NONE;
 import static com.android.launcher3.util.RaceConditionTracker.ENTER;
 import static com.android.launcher3.util.RaceConditionTracker.EXIT;
@@ -102,10 +100,7 @@ import com.android.launcher3.graphics.RotationMode;
 import com.android.launcher3.icons.IconCache;
 import com.android.launcher3.keyboard.CustomActionsPopup;
 import com.android.launcher3.keyboard.ViewGroupFocusHelper;
-import com.android.launcher3.logging.FileLog;
-import com.android.launcher3.logging.StatsLogUtils;
-import com.android.launcher3.logging.UserEventDispatcher;
-import com.android.launcher3.logging.UserEventDispatcher.UserEventDelegate;
+
 import com.android.launcher3.model.AppLaunchTracker;
 import com.android.launcher3.model.BgDataModel.Callbacks;
 import com.android.launcher3.model.ModelWriter;
@@ -117,10 +112,7 @@ import com.android.launcher3.states.InternalStateHandler;
 import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.touch.ItemClickHandler;
 import com.android.launcher3.uioverrides.UiFactory;
-import com.android.launcher3.userevent.nano.LauncherLogProto;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
+
 import com.android.launcher3.util.ActivityResultInfo;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.IntArray;
@@ -164,7 +156,7 @@ import java.util.function.Predicate;
  * Default launcher application.
  */
 public class Launcher extends BaseDraggingActivity implements LauncherExterns,
-        Callbacks, LauncherProviderChangeListener, UserEventDelegate,
+        Callbacks, LauncherProviderChangeListener,
         InvariantDeviceProfile.OnIDPChangeListener {
     public static final String TAG = "Launcher";
     static final boolean LOGD = false;
@@ -473,8 +465,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
     }
 
     private void onIdpChanged(InvariantDeviceProfile idp) {
-        mUserEventDispatcher = null;
-
         DeviceProfile oldWallpaperProfile = getWallpaperDeviceProfile();
         initDeviceProfile(idp);
         dispatchDeviceProfileChanged();
@@ -890,7 +880,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
         if (mLauncherCallbacks != null) {
             mLauncherCallbacks.onStop();
         }
-        logStopAndResume(Action.Command.STOP);
 
         mAppWidgetHost.setListenIfResumed(false);
 
@@ -916,8 +905,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
 
     private void handleDeferredResume() {
         if (hasBeenResumed() && !mStateManager.getState().disableInteraction) {
-            logStopAndResume(Action.Command.RESUME);
-            getUserEventDispatcher().startSession();
 
             UiFactory.onLauncherStateOrResumeChanged(this);
             AppLaunchTracker.INSTANCE.get(this).onReturnedToHome();
@@ -941,17 +928,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
         } else {
             mDeferredResumePending = true;
         }
-    }
-
-    private void logStopAndResume(int command) {
-        int containerType = mStateManager.getState().containerType;
-        if (containerType == ContainerType.WORKSPACE && mWorkspace != null) {
-            getUserEventDispatcher().logActionCommand(command,
-                    containerType, -1, mWorkspace.isOverlayShown() ? -1 : 0);
-        } else {
-            getUserEventDispatcher().logActionCommand(command, containerType, -1);
-        }
-
     }
 
     public void onStateSetStart(LauncherState state) {
@@ -1414,13 +1390,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
                 }
             }
 
-            // Handle HOME_INTENT
-            UserEventDispatcher ued = getUserEventDispatcher();
-            Target target = newContainerTarget(mStateManager.getState().containerType);
-            target.pageIndex = mWorkspace.getCurrentPage();
-            ued.logActionCommand(Action.Command.HOME_INTENT, target,
-                    newContainerTarget(ContainerType.WORKSPACE));
-
             final View v = getWindow().peekDecorView();
             if (v != null && v.getWindowToken() != null) {
                 UiThreadHelper.hideKeyboardAsync(this, v.getWindowToken());
@@ -1769,7 +1738,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
 
         // Note: There should be at most one log per method call. This is enforced implicitly
         // by using if-else statements.
-        UserEventDispatcher ued = getUserEventDispatcher();
         AbstractFloatingView topView = AbstractFloatingView.getTopOpenView(this);
         if (topView != null && topView.onBackPressed()) {
             // Handled by the floating view.
@@ -1806,34 +1774,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
             return true;
         } else {
             return false;
-        }
-    }
-
-    @Override
-    public int getCurrentState() {
-        if (mStateManager.getState() == LauncherState.ALL_APPS) {
-            return StatsLogUtils.LAUNCHER_STATE_ALLAPPS;
-        } else if (mStateManager.getState() == OVERVIEW) {
-            return StatsLogUtils.LAUNCHER_STATE_OVERVIEW;
-        }
-        return StatsLogUtils.LAUNCHER_STATE_HOME;
-    }
-
-    @Override
-    public void modifyUserEvent(LauncherLogProto.LauncherEvent event) {
-        if (event.srcTarget != null && event.srcTarget.length > 0 &&
-                event.srcTarget[1].containerType == ContainerType.PREDICTION) {
-            Target[] targets = new Target[3];
-            targets[0] = event.srcTarget[0];
-            targets[1] = event.srcTarget[1];
-            targets[2] = newTarget(Target.Type.CONTAINER);
-            event.srcTarget = targets;
-            LauncherState state = mStateManager.getState();
-            if (state == LauncherState.ALL_APPS) {
-                event.srcTarget[2].containerType = ContainerType.ALLAPPS;
-            } else if (state == OVERVIEW) {
-                event.srcTarget[2].containerType = ContainerType.TASKSWITCHER;
-            }
         }
     }
 
@@ -2246,7 +2186,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
         if (item.restoreStatus == LauncherAppWidgetInfo.RESTORE_COMPLETED) {
             // Verify that we own the widget
             if (appWidgetInfo == null) {
-                FileLog.e(TAG, "Removing invalid widget: id=" + item.appWidgetId);
                 getModelWriter().deleteWidgetInfo(item, getAppWidgetHost());
                 return null;
             }
@@ -2496,12 +2435,6 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
         // Extra logging for b/116853349
         mDragLayer.dump(prefix, writer);
         mStateManager.dump(prefix, writer);
-
-        try {
-            FileLog.flushAll(writer);
-        } catch (Exception e) {
-            // Ignore
-        }
 
         mModel.dumpState(prefix, fd, writer, args);
 

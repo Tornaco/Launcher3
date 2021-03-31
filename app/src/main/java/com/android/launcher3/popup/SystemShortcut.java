@@ -23,9 +23,6 @@ import com.android.launcher3.WorkspaceItemInfo;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.model.AppLaunchTracker;
 import com.android.launcher3.model.WidgetItem;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
 import com.android.launcher3.util.InstantAppResolver;
 import com.android.launcher3.util.PackageManagerHelper;
 import com.android.launcher3.util.PackageUserKey;
@@ -148,8 +145,6 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity>
                         (WidgetsBottomSheet) launcher.getLayoutInflater().inflate(
                                 R.layout.widgets_bottom_sheet, launcher.getDragLayer(), false);
                 widgetsBottomSheet.populateAndShow(itemInfo);
-                launcher.getUserEventDispatcher().logActionOnControl(Action.Touch.TAP,
-                        ControlType.WIDGETS_BUTTON, view);
             };
         }
     }
@@ -167,8 +162,6 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity>
                 Rect sourceBounds = activity.getViewBounds(view);
                 new PackageManagerHelper(activity).startDetailsActivityForInfo(
                         itemInfo, sourceBounds, ActivityOptions.makeBasic().toBundle());
-                activity.getUserEventDispatcher().logActionOnControl(Action.Touch.TAP,
-                        ControlType.APPINFO_TARGET, view);
             };
         }
     }
@@ -217,12 +210,10 @@ public abstract class SystemShortcut<T extends BaseDraggingActivity>
             if (itemInfo.container != LauncherSettings.Favorites.CONTAINER_PREDICTION) return null;
             return (view) -> {
                 PopupContainerWithArrow.closeAllOpenViews(activity);
-                activity.getUserEventDispatcher().logActionOnControl(Action.Touch.TAP,
-                        ControlType.DISMISS_PREDICTION, ContainerType.DEEPSHORTCUTS);
                 AppLaunchTracker.INSTANCE.get(view.getContext())
                         .onDismissApp(itemInfo.getTargetComponent(),
                                 itemInfo.user,
-                                AppLaunchTracker.CONTAINER_PREDICTIONS);
+                                "CONTAINER_PREDICTIONS");
             };
         }
     }

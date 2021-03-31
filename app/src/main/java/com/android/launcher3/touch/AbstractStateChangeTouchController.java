@@ -42,9 +42,6 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.anim.AnimationSuccessListener;
 import com.android.launcher3.anim.AnimatorPlaybackController;
 import com.android.launcher3.anim.AnimatorSetBuilder;
-import com.android.launcher3.userevent.nano.LauncherLogProto;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action.Direction;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action.Touch;
 import com.android.launcher3.util.FlingBlockCheck;
 import com.android.launcher3.util.PendingAnimation;
 import com.android.launcher3.util.TouchController;
@@ -70,7 +67,6 @@ public abstract class AbstractStateChangeTouchController
 
     private boolean mNoIntercept;
     private boolean mIsLogContainerSet;
-    protected int mStartContainerType;
 
     protected LauncherState mStartState;
     protected LauncherState mFromState;
@@ -178,11 +174,6 @@ public abstract class AbstractStateChangeTouchController
 
     protected abstract float initCurrentAnimation(@AnimationComponents int animComponents);
 
-    /**
-     * Returns the container that the touch started from when leaving NORMAL state.
-     */
-    protected abstract int getLogContainerTypeForNormalState(MotionEvent ev);
-
     private boolean reinitCurrentAnimation(boolean reachedToState, boolean isDragTowardPositive) {
         LauncherState newFromState = mFromState == null ? mLauncher.getStateManager().getState()
                 : reachedToState ? mToState : mFromState;
@@ -282,16 +273,6 @@ public abstract class AbstractStateChangeTouchController
 
     @Override
     public boolean onDrag(float displacement, MotionEvent ev) {
-        if (!mIsLogContainerSet) {
-            if (mStartState == ALL_APPS) {
-                mStartContainerType = LauncherLogProto.ContainerType.ALLAPPS;
-            } else if (mStartState == NORMAL) {
-                mStartContainerType = getLogContainerTypeForNormalState(ev);
-            } else if (mStartState == OVERVIEW) {
-                mStartContainerType = LauncherLogProto.ContainerType.TASKSWITCHER;
-            }
-            mIsLogContainerSet = true;
-        }
         return onDrag(displacement);
     }
 
@@ -371,7 +352,6 @@ public abstract class AbstractStateChangeTouchController
     @Override
     public void onDragEnd(float velocity) {
         boolean fling = mDetector.isFling(velocity);
-        final int logAction = fling ? Touch.FLING : Touch.SWIPE;
 
         boolean blockedFling = fling && mFlingBlockCheck.isBlocked();
         if (blockedFling) {
@@ -427,7 +407,7 @@ public abstract class AbstractStateChangeTouchController
             }
         }
 
-        mCurrentAnimation.setEndAction(() -> onSwipeInteractionCompleted(targetState, logAction));
+        mCurrentAnimation.setEndAction(() -> onSwipeInteractionCompleted(targetState));
         ValueAnimator anim = mCurrentAnimation.getAnimationPlayer();
         anim.setFloatValues(startProgress, endProgress);
         maybeUpdateAtomicAnim(mFromState, targetState, targetState == mToState ? 1f : 0f);
@@ -499,11 +479,7 @@ public abstract class AbstractStateChangeTouchController
                 .setInterpolator(scrollInterpolatorForVelocity(velocity));
     }
 
-    protected int getDirectionForLog() {
-        return mToState.ordinal > mFromState.ordinal ? Direction.UP : Direction.DOWN;
-    }
-
-    protected void onSwipeInteractionCompleted(LauncherState targetState, int logAction) {
+    protected void onSwipeInteractionCompleted(LauncherState targetState) {
         if (mAtomicComponentsController != null) {
             mAtomicComponentsController.getAnimationPlayer().end();
             mAtomicComponentsController = null;
@@ -512,31 +488,18 @@ public abstract class AbstractStateChangeTouchController
         boolean shouldGoToTargetState = true;
         if (mPendingAnimation != null) {
             boolean reachedTarget = mToState == targetState;
-            mPendingAnimation.finish(reachedTarget, logAction);
+            mPendingAnimation.finish(reachedTarget);
             mPendingAnimation = null;
             shouldGoToTargetState = !reachedTarget;
         }
         if (shouldGoToTargetState) {
-            goToTargetState(targetState, logAction);
+            goToTargetState(targetState);
         }
     }
 
-    protected void goToTargetState(LauncherState targetState, int logAction) {
-        if (targetState != mStartState) {
-            logReachedState(logAction, targetState);
-        }
+    protected void goToTargetState(LauncherState targetState) {
         mLauncher.getStateManager().goToState(targetState, false /* animated */);
         mLauncher.getDragLayer().getScrim().animateToSysuiMultiplier(1, 0, 0);
-    }
-
-    private void logReachedState(int logAction, LauncherState targetState) {
-        // Transition complete. log the action
-        mLauncher.getUserEventDispatcher().logStateChangeAction(logAction,
-                getDirectionForLog(), mDetector.getDownX(), mDetector.getDownY(),
-                mStartContainerType,
-                mStartState.containerType,
-                targetState.containerType,
-                mLauncher.getWorkspace().getCurrentPage());
     }
 
     protected void clearState() {

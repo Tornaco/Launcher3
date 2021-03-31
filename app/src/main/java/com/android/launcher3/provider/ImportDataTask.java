@@ -45,7 +45,6 @@ import com.android.launcher3.LauncherSettings.Settings;
 import com.android.launcher3.Workspace;
 import com.android.launcher3.compat.UserManagerCompat;
 import com.android.launcher3.config.FeatureFlags;
-import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.model.GridSizeMigrationTask;
 import com.android.launcher3.util.IntArray;
 import com.android.launcher3.util.IntSparseArrayMap;
@@ -82,8 +81,6 @@ public class ImportDataTask {
     }
 
     public boolean importWorkspace() throws Exception {
-        FileLog.d(TAG, "Importing DB from " + mOtherFavoritesUri);
-
         mHotseatSize = mMaxGridSizeX = mMaxGridSizeY = 0;
         importWorkspaceItems();
         GridSizeMigrationTask.markForMigration(mContext, mMaxGridSizeX, mMaxGridSizeY, mHotseatSize);
@@ -173,9 +170,6 @@ public class ImportDataTask {
                 switch (container) {
                     case Favorites.CONTAINER_DESKTOP: {
                         if (screen < Workspace.FIRST_SCREEN_ID) {
-                            FileLog.d(TAG, String.format(
-                                    "Skipping item %d, type %d not on a valid screen %d",
-                                    id, type, screen));
                             continue;
                         }
                         if (firstScreenId == null) {
@@ -199,7 +193,6 @@ public class ImportDataTask {
                     }
                     default:
                         if (!mValidFolders.get(container)) {
-                            FileLog.d(TAG, String.format("Skipping item %d, type %d not in a valid folder %d", id, type, container));
                             continue;
                         }
                 }
@@ -237,13 +230,11 @@ public class ImportDataTask {
                         break;
                     }
                     default:
-                        FileLog.d(TAG, String.format("Skipping item %d, not a valid type %d", id, type));
                         continue;
                 }
 
                 if (container == Favorites.CONTAINER_HOTSEAT) {
                     if (intent == null) {
-                        FileLog.d(TAG, String.format("Skipping item %d, null intent on hotseat", id));
                         continue;
                     }
                     if (intent.getComponent() != null) {
@@ -274,7 +265,6 @@ public class ImportDataTask {
                 }
             }
         }
-        FileLog.d(TAG, totalItemsOnWorkspace + " items imported from external source");
         if (totalItemsOnWorkspace < MIN_ITEM_COUNT_FOR_SUCCESSFUL_MIGRATION) {
             throw new Exception("Insufficient data");
         }

@@ -18,12 +18,8 @@ package com.android.launcher3.popup;
 
 import static com.android.launcher3.Utilities.squaredHypot;
 import static com.android.launcher3.Utilities.squaredTouchSlop;
-import static com.android.launcher3.notification.NotificationMainView.NOTIFICATION_ITEM_INFO;
 import static com.android.launcher3.popup.PopupPopulator.MAX_SHORTCUTS;
 import static com.android.launcher3.popup.PopupPopulator.MAX_SHORTCUTS_IF_NOTIFICATIONS;
-import static com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import static com.android.launcher3.userevent.nano.LauncherLogProto.ItemType;
-import static com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import static com.android.launcher3.util.Executors.MODEL_EXECUTOR;
 
 import android.animation.AnimatorSet;
@@ -59,7 +55,6 @@ import com.android.launcher3.dot.DotInfo;
 import com.android.launcher3.dragndrop.DragController;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.dragndrop.DragView;
-import com.android.launcher3.logging.LoggerUtils;
 import com.android.launcher3.notification.NotificationInfo;
 import com.android.launcher3.notification.NotificationItemView;
 import com.android.launcher3.notification.NotificationKeyData;
@@ -156,17 +151,6 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         return (type & TYPE_ACTION_POPUP) != 0;
     }
 
-    @Override
-    public void logActionCommand(int command) {
-        mLauncher.getUserEventDispatcher().logActionCommand(
-                command, mOriginalIcon, getLogContainerType());
-    }
-
-    @Override
-    public int getLogContainerType() {
-        return ContainerType.DEEPSHORTCUTS;
-    }
-
     public OnClickListener getItemClickListener() {
         return (view) -> {
             ItemClickHandler.INSTANCE.onClick(view);
@@ -179,8 +163,6 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             BaseDragLayer dl = getPopupContainer();
             if (!dl.isEventOverView(this, ev)) {
-                mLauncher.getUserEventDispatcher().logActionTapOutside(
-                        LoggerUtils.newContainerTarget(ContainerType.DEEPSHORTCUTS));
                 close(true);
 
                 // We let touches on the original icon go through so that users can launch
@@ -478,7 +460,6 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
                     // Make sure we keep the original icon hidden while it is being dragged.
                     mOriginalIcon.setVisibility(INVISIBLE);
                 } else {
-                    mLauncher.getUserEventDispatcher().logDeepShortcutsOpen(mOriginalIcon);
                     if (!mIsAboveIcon) {
                         // Show the icon but keep the text hidden.
                         mOriginalIcon.setVisibility(VISIBLE);
@@ -553,17 +534,6 @@ public class PopupContainerWithArrow extends ArrowPopup implements DragSource,
                 }
             }
         }
-    }
-
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
-        if (info == NOTIFICATION_ITEM_INFO) {
-            target.itemType = ItemType.NOTIFICATION;
-        } else {
-            target.itemType = ItemType.DEEPSHORTCUT;
-            target.rank = info.rank;
-        }
-        targetParent.containerType = ContainerType.DEEPSHORTCUTS;
     }
 
     @Override

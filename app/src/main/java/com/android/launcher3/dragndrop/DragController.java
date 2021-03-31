@@ -222,7 +222,6 @@ public class DragController implements DragDriver.EventListener, TouchController
         }
 
         handleMoveEvent(mLastTouch[0], mLastTouch[1]);
-        mLauncher.getUserEventDispatcher().resetActionDurationMillis();
         return dragView;
     }
 
@@ -634,7 +633,6 @@ public class DragController implements DragDriver.EventListener, TouchController
             }
         }
         final View dropTargetAsView = dropTarget instanceof View ? (View) dropTarget : null;
-        mLauncher.getUserEventDispatcher().logDragNDrop(mDragObject, dropTargetAsView);
         dispatchDropComplete(dropTargetAsView, accepted);
     }
 

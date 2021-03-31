@@ -21,18 +21,14 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.android.launcher3.graphics.RotationMode;
-import com.android.launcher3.logging.StatsLogUtils.LogContainerProvider;
-import com.android.launcher3.userevent.nano.LauncherLogProto;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.views.Transposable;
 
-public class Hotseat extends CellLayout implements LogContainerProvider, Insettable, Transposable {
+public class Hotseat extends CellLayout implements Insettable, Transposable {
 
     @ViewDebug.ExportedProperty(category = "launcher")
     private boolean mHasVerticalHotseat;
@@ -67,13 +63,6 @@ public class Hotseat extends CellLayout implements LogContainerProvider, Insetta
         } else {
             setGridSize(idp.numHotseatIcons, 1);
         }
-    }
-
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
-        target.gridX = info.cellX;
-        target.gridY = info.cellY;
-        targetParent.containerType = LauncherLogProto.ContainerType.HOTSEAT;
     }
 
     @Override

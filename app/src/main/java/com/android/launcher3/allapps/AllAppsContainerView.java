@@ -50,8 +50,6 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.compat.AccessibilityManagerCompat;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.keyboard.FocusedItemDecorator;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Target;
 import com.android.launcher3.util.ItemInfoMatcher;
 import com.android.launcher3.util.MultiValueAlpha;
 import com.android.launcher3.util.MultiValueAlpha.AlphaProperty;
@@ -295,15 +293,6 @@ public class AllAppsContainerView extends SpringRelativeLayout implements DragSo
 
     @Override
     public void onDropCompleted(View target, DragObject d, boolean success) { }
-
-    @Override
-    public void fillInLogContainerData(View v, ItemInfo info, Target target, Target targetParent) {
-        if (getApps().hasFilter()) {
-            targetParent.containerType = ContainerType.SEARCHRESULT;
-        } else {
-            targetParent.containerType = ContainerType.ALLAPPS;
-        }
-    }
 
     @Override
     public void setInsets(Rect insets) {

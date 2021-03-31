@@ -45,7 +45,6 @@ import com.android.launcher3.compat.LauncherAppsCompat;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.icons.BitmapInfo;
 import com.android.launcher3.icons.LauncherIcons;
-import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.util.ContentWriter;
 import com.android.launcher3.util.GridOccupancy;
 import com.android.launcher3.util.IntArray;
@@ -307,7 +306,6 @@ public class LoaderCursor extends CursorWrapper {
      * Marks the current item for removal
      */
     public void markDeleted(String reason) {
-        FileLog.e(TAG, reason);
         itemsToRemove.add(id);
     }
 

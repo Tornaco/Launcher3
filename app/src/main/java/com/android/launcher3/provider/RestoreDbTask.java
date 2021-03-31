@@ -36,7 +36,6 @@ import com.android.launcher3.LauncherProvider.DatabaseHelper;
 import com.android.launcher3.LauncherSettings.Favorites;
 import com.android.launcher3.WorkspaceItemInfo;
 import com.android.launcher3.Utilities;
-import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.provider.LauncherDbUtils.SQLiteTransaction;
 import com.android.launcher3.util.IntArray;
 import com.android.launcher3.util.LogConfig;
@@ -70,7 +69,6 @@ public class RestoreDbTask {
             t.commit();
             return true;
         } catch (Exception e) {
-            FileLog.e(TAG, "Failed to verify db", e);
             return false;
         }
     }
@@ -113,9 +111,6 @@ public class RestoreDbTask {
             profileIds[i] = Long.toString(profileMapping.keyAt(i));
         }
         int itemsDeleted = db.delete(Favorites.TABLE_NAME, whereClause.toString(), profileIds);
-        if (itemsDeleted > 0) {
-            FileLog.d(TAG, itemsDeleted + " items from unrestored user(s) were deleted");
-        }
 
         // Mark all items as restored.
         boolean keepAllIcons = Utilities.isPropertyEnabled(LogConfig.KEEP_ALL_ICONS);
@@ -166,7 +161,6 @@ public class RestoreDbTask {
      * Updates profile id of all entries from {@param oldProfileId} to {@param newProfileId}.
      */
     protected void migrateProfileId(SQLiteDatabase db, long oldProfileId, long newProfileId) {
-        FileLog.d(TAG, "Changing profile user id from " + oldProfileId + " to " + newProfileId);
         // Update existing entries.
         ContentValues values = new ContentValues();
         values.put(Favorites.PROFILE_ID, newProfileId);
@@ -231,7 +225,6 @@ public class RestoreDbTask {
     }
 
     public static void setPending(Context context, boolean isPending) {
-        FileLog.d(TAG, "Restore data received through full backup " + isPending);
         Utilities.getPrefs(context).edit().putBoolean(RESTORE_TASK_PENDING, isPending).commit();
     }
 
@@ -241,8 +234,6 @@ public class RestoreDbTask {
             AppWidgetsRestoredReceiver.restoreAppWidgetIds(context,
                     IntArray.fromConcatString(prefs.getString(APPWIDGET_OLD_IDS, "")).toArray(),
                     IntArray.fromConcatString(prefs.getString(APPWIDGET_IDS, "")).toArray());
-        } else {
-            FileLog.d(TAG, "No app widget ids to restore.");
         }
 
         prefs.edit().remove(APPWIDGET_OLD_IDS)
@@ -254,7 +245,7 @@ public class RestoreDbTask {
         Utilities.getPrefs(context).edit()
                 .putString(APPWIDGET_OLD_IDS, IntArray.wrap(oldIds).toConcatString())
                 .putString(APPWIDGET_IDS, IntArray.wrap(newIds).toConcatString())
-                .commit();
+                .apply();
     }
 
 }

@@ -15,9 +15,6 @@
  */
 package com.android.launcher3.views;
 
-import static com.android.launcher3.Utilities.EXTRA_WALLPAPER_FLAVOR;
-import static com.android.launcher3.Utilities.EXTRA_WALLPAPER_OFFSET;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -40,12 +37,13 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.popup.ArrowPopup;
 import com.android.launcher3.shortcuts.DeepShortcutView;
-import com.android.launcher3.userevent.nano.LauncherLogProto.Action;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ControlType;
 import com.android.launcher3.widget.WidgetsFullSheet;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.android.launcher3.Utilities.EXTRA_WALLPAPER_FLAVOR;
+import static com.android.launcher3.Utilities.EXTRA_WALLPAPER_OFFSET;
 
 
 /**
@@ -67,31 +65,24 @@ public class OptionsPopupView extends ArrowPopup
 
     @Override
     public void onClick(View view) {
-        handleViewClick(view, Action.Touch.TAP);
+        handleViewClick(view);
     }
 
     @Override
     public boolean onLongClick(View view) {
-        return handleViewClick(view, Action.Touch.LONGPRESS);
+        return handleViewClick(view);
     }
 
-    private boolean handleViewClick(View view, int action) {
+    private boolean handleViewClick(View view) {
         OptionItem item = mItemMap.get(view);
         if (item == null) {
             return false;
-        }
-        if (item.mControlTypeForLog > 0) {
-            logTap(action, item.mControlTypeForLog);
         }
         if (item.mClickListener.onLongClick(view)) {
             close(true);
             return true;
         }
         return false;
-    }
-
-    private void logTap(int action, int controlType) {
-        mLauncher.getUserEventDispatcher().logActionOnControl(action, controlType);
     }
 
     @Override
@@ -104,11 +95,6 @@ public class OptionsPopupView extends ArrowPopup
         }
         close(true);
         return true;
-    }
-
-    @Override
-    public void logActionCommand(int command) {
-        // TODO:
     }
 
     @Override
@@ -157,13 +143,13 @@ public class OptionsPopupView extends ArrowPopup
         int resDrawable = Utilities.existsStyleWallpapers(launcher) ?
                 R.drawable.ic_palette : R.drawable.ic_wallpaper;
         options.add(new OptionItem(resString, resDrawable,
-                ControlType.WALLPAPER_BUTTON, OptionsPopupView::startWallpaperPicker));
+                OptionsPopupView::startWallpaperPicker));
         if (!FeatureFlags.GO_DISABLE_WIDGETS) {
             options.add(new OptionItem(R.string.widget_button_text, R.drawable.ic_widget,
-                    ControlType.WIDGETS_BUTTON, OptionsPopupView::onWidgetsClicked));
+                    OptionsPopupView::onWidgetsClicked));
         }
         options.add(new OptionItem(R.string.settings_button_text, R.drawable.ic_setting,
-                ControlType.SETTINGS_BUTTON, OptionsPopupView::startSettings));
+                OptionsPopupView::startSettings));
 
         show(launcher, target, options);
     }
@@ -172,7 +158,9 @@ public class OptionsPopupView extends ArrowPopup
         return openWidgets(Launcher.getLauncher(view.getContext())) != null;
     }
 
-    /** Returns WidgetsFullSheet that was opened, or null if nothing was opened. */
+    /**
+     * Returns WidgetsFullSheet that was opened, or null if nothing was opened.
+     */
     @Nullable
     public static WidgetsFullSheet openWidgets(Launcher launcher) {
         if (launcher.getPackageManager().isSafeMode()) {
@@ -221,14 +209,12 @@ public class OptionsPopupView extends ArrowPopup
 
         private final int mLabelRes;
         private final int mIconRes;
-        private final int mControlTypeForLog;
         private final OnLongClickListener mClickListener;
 
-        public OptionItem(int labelRes, int iconRes, int controlTypeForLog,
-                OnLongClickListener clickListener) {
+        public OptionItem(int labelRes, int iconRes,
+                          OnLongClickListener clickListener) {
             mLabelRes = labelRes;
             mIconRes = iconRes;
-            mControlTypeForLog = controlTypeForLog;
             mClickListener = clickListener;
         }
     }

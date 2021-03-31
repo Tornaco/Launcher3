@@ -25,7 +25,6 @@ import com.android.launcher3.InstallShortcutReceiver;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.Workspace;
-import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
 
 /**
  * Definition for spring loaded state used during drag and drop.
@@ -37,7 +36,7 @@ public class SpringLoadedState extends LauncherState {
             FLAG_DISABLE_PAGE_CLIPPING | FLAG_PAGE_BACKGROUNDS | FLAG_HIDE_BACK_BUTTON;
 
     public SpringLoadedState(int id) {
-        super(id, ContainerType.OVERVIEW, SPRING_LOADED_TRANSITION_MS, STATE_FLAGS);
+        super(id, SPRING_LOADED_TRANSITION_MS, STATE_FLAGS);
     }
 
     @Override
