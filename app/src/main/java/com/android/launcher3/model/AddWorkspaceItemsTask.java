@@ -30,6 +30,7 @@ import com.android.launcher3.ItemInfo;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherAppWidgetInfo;
 import com.android.launcher3.LauncherModel.CallbackTask;
+import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.model.BgDataModel.Callbacks;
 import com.android.launcher3.LauncherSettings;
 import com.android.launcher3.WorkspaceItemInfo;
@@ -78,6 +79,11 @@ public class AddWorkspaceItemsTask extends BaseModelUpdateTask {
                         item.itemType == LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT) {
                     // Short-circuit this logic if the icon exists somewhere on the workspace
                     if (shortcutExists(dataModel, item.getIntent(), item.user)) {
+                        continue;
+                    }
+
+                    // b/139663018 Short-circuit this logic if the icon is a system app
+                    if (!FeatureFlags.DISABLE_ALL_APPS && PackageManagerHelper.isSystemApp(app.getContext(), item.getIntent())) {
                         continue;
                     }
                 }
