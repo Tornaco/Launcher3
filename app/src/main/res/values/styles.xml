@@ -43,6 +43,8 @@
         <item name="workspaceAmbientShadowColor">#33000000</item>
         <item name="workspaceKeyShadowColor">#44000000</item>
         <item name="workspaceStatusBarScrim">@drawable/workspace_bg</item>
+        <item name="workspaceIndicatorActiveColor">@android:color/white</item>
+        <item name="workspaceIndicatorInActiveColor">#696969</item>
         <item name="widgetsTheme">@style/WidgetContainerTheme</item>
         <item name="folderDotColor">?android:attr/colorPrimary</item>
         <item name="folderFillColor">#CDFFFFFF</item>

@@ -81,7 +81,6 @@ public class SpringLoadedState extends LauncherState {
     public void onStateEnabled(Launcher launcher) {
         Workspace ws = launcher.getWorkspace();
         ws.showPageIndicatorAtCurrentScroll();
-        ws.getPageIndicator().setShouldAutoHide(false);
 
         // Prevent any Un/InstallShortcutReceivers from updating the db while we are
         // in spring loaded mode
@@ -96,8 +95,6 @@ public class SpringLoadedState extends LauncherState {
 
     @Override
     public void onStateDisabled(final Launcher launcher) {
-        launcher.getWorkspace().getPageIndicator().setShouldAutoHide(true);
-
         // Re-enable any Un/InstallShortcutReceiver and now process any queued items
         InstallShortcutReceiver.disableAndFlushInstallQueue(
                 InstallShortcutReceiver.FLAG_DRAG_AND_DROP, launcher);

@@ -24,6 +24,7 @@ import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -113,8 +114,8 @@ public class PageIndicatorDots extends View implements PageIndicator {
         mDotRadius = getResources().getDimension(R.dimen.page_indicator_dot_size) / 2;
         setOutlineProvider(new MyOutlineProver());
 
-        mActiveColor = Themes.getColorAccent(context);
-        mInActiveColor = Themes.getAttrColor(context, android.R.attr.colorControlHighlight);
+        mActiveColor = Themes.getAttrColor(context,R.attr.workspaceIndicatorActiveColor);
+        mInActiveColor = Themes.getAttrColor(context,R.attr.workspaceIndicatorInActiveColor);
 
         mIsRtl = Utilities.isRtl(getResources());
     }
