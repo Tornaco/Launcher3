@@ -63,7 +63,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(':IconLoader')
+    implementation project(':icon_loader')
     implementation project(':systemui')
 
     implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"

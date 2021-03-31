@@ -1,4 +1,3 @@
 include ':systemui'
 include ':app'
-include ':IconLoader'
-project(':IconLoader').projectDir = new File(rootDir, 'iconloaderlib')
+include ':icon_loader'
