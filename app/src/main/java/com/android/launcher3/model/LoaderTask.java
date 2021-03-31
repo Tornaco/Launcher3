@@ -193,7 +193,7 @@ public class LoaderTask implements Runnable {
 
             if (FeatureFlags.DISABLE_ALL_APPS) {
                 TraceHelper.partitionSection(TAG, "step 2.1.1: loading all apps");
-                verifyApplications();
+                addAllAppsToWorkSpace();
             }
 
             TraceHelper.partitionSection(TAG, "step 2.2: Binding all apps");
@@ -253,7 +253,7 @@ public class LoaderTask implements Runnable {
     }
 
     // Add for load all app on workspace
-    private void verifyApplications() {
+    private void addAllAppsToWorkSpace() {
         final Context context = mApp.getContext();
         ArrayList<Pair<ItemInfo, Object>> installQueue = new ArrayList<>();
         final List<UserHandle> profiles = mUserManager.getUserProfiles();
