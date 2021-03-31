@@ -20,6 +20,9 @@ android {
         debug {
             minifyEnabled false
         }
+        release {
+            minifyEnabled false
+        }
     }
 
     compileOptions {
@@ -33,10 +36,6 @@ android {
                 srcDir 'protos/'
                 srcDir 'proto_overrides/'
             }
-        }
-
-        debug {
-            manifest.srcFile "AndroidManifest.xml"
         }
 
         androidTest {

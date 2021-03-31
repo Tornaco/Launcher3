@@ -56,6 +56,7 @@ public abstract class BaseFlags {
     }
 
     public static final boolean IS_DOGFOOD_BUILD = false;
+    public static final boolean DISABLE_ALL_APPS = true;
 
     // When enabled the promise icon is visible in all apps while installation an app.
     public static final boolean LAUNCHER3_PROMISE_APPS_IN_ALL_APPS = false;

@@ -9,6 +9,7 @@ import com.android.launcher3.AbstractFloatingView;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.LauncherStateManager.AnimationComponents;
+import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.touch.AbstractStateChangeTouchController;
 import com.android.launcher3.touch.SingleAxisSwipeDetector;
 import com.android.launcher3.userevent.nano.LauncherLogProto.ContainerType;
@@ -26,6 +27,10 @@ public class AllAppsSwipeController extends AbstractStateChangeTouchController {
 
     @Override
     protected boolean canInterceptTouch(MotionEvent ev) {
+        if (FeatureFlags.ALL_APPS_TABS_ENABLED) {
+            return false;
+        }
+
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
             mTouchDownEvent = ev;
         }

@@ -39,6 +39,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.MutableInt;
+import android.util.Pair;
 
 import com.android.launcher3.AppInfo;
 import com.android.launcher3.FolderInfo;
@@ -190,6 +191,11 @@ public class LoaderTask implements Runnable {
             TraceHelper.partitionSection(TAG, "step 2.1: loading all apps");
             List<LauncherActivityInfo> allActivityList = loadAllApps();
 
+            if (FeatureFlags.DISABLE_ALL_APPS) {
+                TraceHelper.partitionSection(TAG, "step 2.1.1: loading all apps");
+                verifyApplications();
+            }
+
             TraceHelper.partitionSection(TAG, "step 2.2: Binding all apps");
             verifyNotStopped();
             mResults.bindAllApps();
@@ -244,6 +250,27 @@ public class LoaderTask implements Runnable {
             TraceHelper.partitionSection(TAG, "Cancelled");
         }
         TraceHelper.endSection(TAG);
+    }
+
+    // Add for load all app on workspace
+    private void verifyApplications() {
+        final Context context = mApp.getContext();
+        ArrayList<Pair<ItemInfo, Object>> installQueue = new ArrayList<>();
+        final List<UserHandle> profiles = mUserManager.getUserProfiles();
+        for (UserHandle user : profiles) {
+            final List<LauncherActivityInfo> apps = mLauncherApps.getActivityList(null, user);
+            ArrayList<InstallShortcutReceiver.PendingInstallShortcutInfo> added = new ArrayList<InstallShortcutReceiver.PendingInstallShortcutInfo>();
+            synchronized (this) {
+                for (LauncherActivityInfo app : apps) {
+                    InstallShortcutReceiver.PendingInstallShortcutInfo pendingInstallShortcutInfo = new InstallShortcutReceiver.PendingInstallShortcutInfo(app, context);
+                    added.add(pendingInstallShortcutInfo);
+                    installQueue.add(pendingInstallShortcutInfo.getItemInfo());
+                }
+            }
+            if (!added.isEmpty()) {
+                mApp.getModel().addAndBindAddedWorkspaceItems(installQueue);
+            }
+        }
     }
 
     public synchronized void stopLocked() {
