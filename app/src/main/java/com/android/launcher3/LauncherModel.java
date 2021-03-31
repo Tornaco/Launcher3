@@ -145,6 +145,7 @@ public class LauncherModel extends BroadcastReceiver
      * Adds the provided items to the workspace.
      */
     public void addAndBindAddedWorkspaceItems(List<Pair<ItemInfo, Object>> itemList) {
+        Log.i(TAG, "addAndBindAddedWorkspaceItems");
         Callbacks callbacks = getCallback();
         if (callbacks != null) {
             callbacks.preAddApps();

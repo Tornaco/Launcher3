@@ -1995,6 +1995,7 @@ public class Launcher extends BaseDraggingActivity implements LauncherExterns,
 
     @Override
     public void preAddApps() {
+        Log.i(TAG, "preAddApps");
         // If there's an undo snackbar, force it to complete to ensure empty screens are removed
         // before trying to add new items.
         mModelWriter.commitDelete();

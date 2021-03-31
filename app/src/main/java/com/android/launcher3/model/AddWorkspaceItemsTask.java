@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.pm.LauncherActivityInfo;
 import android.content.pm.PackageInstaller.SessionInfo;
 import android.os.UserHandle;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.Pair;
 
@@ -45,6 +46,7 @@ import java.util.List;
  * Task to add auto-created workspace items.
  */
 public class AddWorkspaceItemsTask extends BaseModelUpdateTask {
+    private static final String TAG = "AddWorkspaceItemsTask";
 
     private final List<Pair<ItemInfo, Object>> mItemList;
 
@@ -57,7 +59,9 @@ public class AddWorkspaceItemsTask extends BaseModelUpdateTask {
 
     @Override
     public void execute(LauncherAppState app, BgDataModel dataModel, AllAppsList apps) {
+        Log.i(TAG, "execute");
         if (mItemList.isEmpty()) {
+            Log.w(TAG, "mItemList is empty.");
             return;
         }
 
@@ -76,13 +80,9 @@ public class AddWorkspaceItemsTask extends BaseModelUpdateTask {
                     if (shortcutExists(dataModel, item.getIntent(), item.user)) {
                         continue;
                     }
-
-                    // b/139663018 Short-circuit this logic if the icon is a system app
-                    if (PackageManagerHelper.isSystemApp(app.getContext(), item.getIntent())) {
-                        continue;
-                    }
                 }
 
+                Log.w(TAG, "item.itemType= " + item.itemType);
                 if (item.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPLICATION) {
                     if (item instanceof AppInfo) {
                         item = ((AppInfo) item).makeWorkspaceItem();

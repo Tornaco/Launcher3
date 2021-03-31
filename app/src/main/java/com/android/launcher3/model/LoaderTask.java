@@ -265,6 +265,7 @@ public class LoaderTask implements Runnable {
                     InstallShortcutReceiver.PendingInstallShortcutInfo pendingInstallShortcutInfo = new InstallShortcutReceiver.PendingInstallShortcutInfo(app, context);
                     added.add(pendingInstallShortcutInfo);
                     installQueue.add(pendingInstallShortcutInfo.getItemInfo());
+                    Log.i(TAG, "verifyApplications, app: " + app.getName());
                 }
             }
             if (!added.isEmpty()) {
